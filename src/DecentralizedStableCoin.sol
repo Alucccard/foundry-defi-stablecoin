@@ -11,8 +11,8 @@
 // State variables
 // Events
 // Modifiers
-// Functionsd
 
+// Functions
 // Layout of Functions:
 // constructor
 // receive function (if exists)
@@ -38,7 +38,7 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 * @Volatility: Low
 */
 
-contract DecentralizedStableCoin is ERC20Burnable {
+contract DecentralizedStableCoin is ERC20Burnable, Ownable {
     error DecentralizedStableCoin__AmountMustBeMoreThanZero();
     error DecentralizedStableCoin__BurnAmountExceedsBalance(uint256 balance, uint256 burnAmount);
     error DecentralizedStableCoin__MintToZeroAddress();
@@ -48,7 +48,7 @@ contract DecentralizedStableCoin is ERC20Burnable {
 
     //onlyOwner is a modifier from Ownable.sol?
     //owner can burn tokens
-    function burn(uint256 _amount) override publick onlyOwner {
+    function burn(uint256 _amount) public override onlyOwner {
         uint256 balance = balanceOf(msg.sender);
         if (_amount <= 0) {
             revert DecentralizedStableCoin__AmountMustBeMoreThanZero();
