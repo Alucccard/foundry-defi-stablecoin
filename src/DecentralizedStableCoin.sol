@@ -23,7 +23,7 @@
 // private
 // view & pure function
 
-pragma solidity 0.8.19;
+pragma solidity ^0.8.19;
 
 import {ERC20Burnable, ERC20} from "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
@@ -31,20 +31,21 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 // This is considered an Exogenous, Decentralized, Anchored (pegged), Crypto Collateralized low volatility coin
 
 /*
-* @Decentralized Stable Coin (DSC)
-* @author Alucccard gloomwing
-* @Collateral: Exogenous Crypto Assets(e.g., ETH, BTC, etc.)
-* @Pegged to: USD
-* @Volatility: Low
-*/
+ * @Decentralized Stable Coin (DSC)
+ * @author Alucccard gloomwing
+ * @Collateral: Exogenous Crypto Assets(e.g., ETH, BTC, etc.)
+ * @Pegged to: USD
+ * @Volatility: Low
+ */
 
 contract DecentralizedStableCoin is ERC20Burnable, Ownable {
     error DecentralizedStableCoin__AmountMustBeMoreThanZero();
     error DecentralizedStableCoin__BurnAmountExceedsBalance(uint256 balance, uint256 burnAmount);
     error DecentralizedStableCoin__MintToZeroAddress();
+
     //ERC20Burnable is ERC20,so constructor of ERC20 needs to be called
 
-    constructor() ERC20("Decentralized Stable Coin", "DSC") {}
+    constructor() ERC20("Decentralized Stable Coin", "DSC") Ownable(msg.sender){}
 
     //onlyOwner is a modifier from Ownable.sol?
     //owner can burn tokens
@@ -59,7 +60,7 @@ contract DecentralizedStableCoin is ERC20Burnable, Ownable {
         super.burn(_amount);
     }
 
-    function mint(address _to, uint256 _amount) external onlyOwner {
+    function mint(address _to, uint256 _amount) external onlyOwner returns (bool) {
         if (_amount <= 0) {
             revert DecentralizedStableCoin__AmountMustBeMoreThanZero();
         }
@@ -67,5 +68,6 @@ contract DecentralizedStableCoin is ERC20Burnable, Ownable {
             revert DecentralizedStableCoin__MintToZeroAddress();
         }
         _mint(_to, _amount);
+        return true;
     }
 }
