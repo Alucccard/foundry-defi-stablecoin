@@ -2,16 +2,8 @@
 
 // Layout of Script:
 // version
-pragma solidity ^0.8.19;
 
 // imports
-import {Test} from "forge-std/Test.sol";
-import {DeployDSC} from "../../script/DeployDSC.s.sol";
-import {DecentralizedStableCoin} from "../../src/DecentralizedStableCoin.sol";
-import {DSCEngine} from "../../src/DSCEngine.sol";
-import {HelperConfig} from "../../script/HelperConfig.s.sol";
-import {ERC20Mock} from "../mocks/ERC20Mock.sol";
-
 // interfaces, libraries, contracts
 
 // Layout of Contract Elements:
@@ -34,14 +26,25 @@ import {ERC20Mock} from "../mocks/ERC20Mock.sol";
 
 //////////*version*///////////
 
+pragma solidity ^0.8.19;
+
 //////////*imports*///////////
+import {Test} from "forge-std/Test.sol";
+import {DeployDSC} from "../../script/DeployDSC.s.sol";
+import {DecentralizedStableCoin} from "../../src/DecentralizedStableCoin.sol";
+import {DSCEngine} from "../../src/DSCEngine.sol";
+import {HelperConfig} from "../../script/HelperConfig.s.sol";
+import {ERC20Mock} from "../mocks/ERC20Mock.sol";
 
 //////////*interfaces*///////////
 
 //////////*libraries*///////////
 
-/////////*contracts*///////////
+/////////*test contracts*///////////
+
 contract DSCEngineTest is Test {
+    /////////*Variable declarations*///////////
+
     //DeployDSC script to deploy DSC and DSCEngine
     DeployDSC deployer;
     //the contracts to be tested
@@ -55,19 +58,9 @@ contract DSCEngineTest is Test {
     uint256 public constant AMOUNT_COLLATERAL = 10 ether;
     uint256 public constant STARTING_ERC20_BALANCE = 10 ether;
 
+    /////////*setup function*///////////
     //setup function to deploy the contracts
 
-    /////////*errors*///////////
-
-    /////////*Type declarations*///////////
-
-    //////////*State variables*///////////
-
-    /////////*Events*///////////
-
-    /////////*Modifiers*///////////
-
-    ///////////*Functions*///////////
     function setUp() public {
         deployer = new DeployDSC();
         (dSC, dSCEngine, helperConfig) = deployer.run();
@@ -76,11 +69,20 @@ contract DSCEngineTest is Test {
         ERC20Mock(weth).mint(USER, STARTING_ERC20_BALANCE);
     }
 
+    /////////*test functions*///////////
+
     function testGetUsdValue() public view {
         uint256 ethAmount = 15e18;
         uint256 expectedUsdValue = 30000e18;
         uint256 actualUsdValue = dSCEngine.getUsdValue(weth, ethAmount);
         assertEq(expectedUsdValue, actualUsdValue);
+    }
+
+    function testGetTokenAmountFromUsd() public view {
+        uint256 usdAmount = 100 ether;
+        uint256 expectedEthAmount = 0.05 ether;
+        uint256 actualEthAmount = dSCEngine.getTokenAmountFromUsd(weth, usdAmount);
+        assertEq(expectedEthAmount, actualEthAmount);
     }
 
     function testRevertsIfCollateralZero() public {
@@ -91,18 +93,4 @@ contract DSCEngineTest is Test {
         dSCEngine.depositCollateral(weth, 0);
         vm.stopPrank();
     }
-
-    //////////*constructor*///////////
-
-    /////////*receive function*///////////
-
-    /////////*fallback function*///////////
-
-    /////////*external function*///////////
-
-    /////////*public function*///////////
-
-    /////////*internal function*///////////
-
-    /////////*private function*///////////
 }
