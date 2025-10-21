@@ -93,4 +93,14 @@ contract DSCEngineTest is Test {
         dSCEngine.depositCollateral(weth, 0);
         vm.stopPrank();
     }
+
+    function testRevertWithUnapprovedCollateral() public {
+        ERC20Mock testToken = new ERC20Mock("Test Token", "TST");
+        //mint some test tokens to USER
+        testToken.mint(USER, AMOUNT_COLLATERAL);
+        vm.startPrank(USER);
+        vm.expectRevert(abi.encodeWithSelector(DSCEngine.DSCEngine_NotAllowedToken.selector, address(testToken)));
+        dSCEngine.depositCollateral(address(testToken), AMOUNT_COLLATERAL);
+        vm.stopPrank();
+    }
 }

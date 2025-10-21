@@ -31,6 +31,7 @@ import {DecentralizedStableCoin} from "./DecentralizedStableCoin.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
+import {OracleLib} from "./libraries/OracleLib.sol";
 
 /// Minimal ReentrancyGuard replacement to avoid external import resolution issues.
 
@@ -71,6 +72,7 @@ contract DSCEngine is ReentrancyGuard {
     error DSCEngine_HealthFactorNotImproved(uint256 healthFactor);
 
     //////////*type declarations*///////////
+    using OracleLib for AggregatorV3Interface;
 
     ///////////*state variables*///////////
     DecentralizedStableCoin private immutable i_DSC;
@@ -262,7 +264,7 @@ contract DSCEngine is ReentrancyGuard {
 
     function getUsdValue(address tokenAddress, uint256 amountToken) public view returns (uint256) {
         AggregatorV3Interface priceFeed = AggregatorV3Interface(s_priceFeeds[tokenAddress]);
-        (, int256 price,,,) = priceFeed.latestRoundData();
+        (, int256 price,,,) = priceFeed.staleCheckLastestRoundData();
         //addtional precision is 1e10 to make price 18 decimals, price feed has 8 decimals
         //precision is 1e18 to make amountToken 18 decimals
         return (uint256(price) * ADDITIONAL_FEED_PRECISION / PRECISION * amountToken);
@@ -270,7 +272,7 @@ contract DSCEngine is ReentrancyGuard {
 
     function getTokenAmountFromUsd(address tokenAddress, uint256 usdAmount) public view returns (uint256) {
         AggregatorV3Interface priceFeed = AggregatorV3Interface(s_priceFeeds[tokenAddress]);
-        (, int256 price,,,) = priceFeed.latestRoundData();
+        (, int256 price,,,) = priceFeed.staleCheckLastestRoundData();
         //additional precision is 1e10 to make price 18 decimals, price feed has 8 decimals
         //usdAmount is in 18 decimals
         return (usdAmount * PRECISION) / (uint256(price) * ADDITIONAL_FEED_PRECISION);

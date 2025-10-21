@@ -45,7 +45,7 @@ contract DecentralizedStableCoin is ERC20Burnable, Ownable {
 
     //ERC20Burnable is ERC20,so constructor of ERC20 needs to be called
 
-    constructor() ERC20("Decentralized Stable Coin", "DSC") Ownable(msg.sender){}
+    constructor() ERC20("Decentralized Stable Coin", "DSC") Ownable(msg.sender) {}
 
     //onlyOwner is a modifier from Ownable.sol?
     //owner can burn tokens
